@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.lightBlueAccent.shade400,
         title: const Text(
-          'GRE Vocabulary Application',
+          'ENGLISH TO TURKISH DICTIONARY',
           style: TextStyle(
             fontStyle: FontStyle.italic,
             color: Colors.black,
