@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'favorites_page.dart';
+import 'word.dart'; // Import the Word class
+import 'package:share/share.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -30,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _foundWords = _allWords.map((word) => Word.fromMap(word)).toList();
-    _favoriteWords = _foundWords.where((word) => word.favorite).toList();
+    _favoriteWords = [];
   }
 
   void _filter(String key) {
@@ -49,39 +52,42 @@ class _HomePageState extends State<HomePage> {
 
   void _toggleFavorite(int id) {
     setState(() {
-      final word = _foundWords.firstWhere((word) => word.id == id);
-      word.favorite = !word.favorite;
-      _favoriteWords = _foundWords.where((word) => word.favorite).toList();
+      final index = _foundWords.indexWhere((word) => word.id == id);
+      if (index != -1) {
+        _foundWords[index].favorite = !_foundWords[index].favorite;
+        if (_foundWords[index].favorite) {
+          _favoriteWords.add(_foundWords[index]);
+        } else {
+          _favoriteWords.removeWhere((word) => word.id == id);
+        }
+      }
     });
-  }
-
-  void _shareApp() {
-    // Implement sharing functionality
-    // For example, using the 'share' package
-    // Share.share('Check out this GRE Vocabulary app!');
-  }
-
-  void _navigateToFavorites() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FavoritesPage(favoriteWords: _favoriteWords)),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellow.shade500,
       appBar: AppBar(
-        title: const Text('GRE Vocabulary Application'),
+        backgroundColor: Colors.lightBlueAccent.shade400,
+        title: const Text(
+          'ENGLISH TO TURKISH DICTIONARY',
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
         centerTitle: true,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
+          children: <Widget>[
+            DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.lightBlueAccent.shade400,
               ),
               child: Text(
                 'Menu',
@@ -92,14 +98,24 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.favorite),
-              title: const Text('Favorites'),
-              onTap: _navigateToFavorites,
+              leading: Icon(Icons.favorite),
+              title: Text('Favorites'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FavoritesPage(),
+                    settings: RouteSettings(arguments: _favoriteWords),
+                  ),
+                );
+              },
             ),
             ListTile(
-              leading: const Icon(Icons.share),
-              title: const Text('Share'),
-              onTap: _shareApp,
+              leading: Icon(Icons.share),
+              title: Text('Share'),
+              onTap: () {
+                Share.share('Check out this amazing GRE Vocabulary app!');
+              },
             ),
           ],
         ),
@@ -129,7 +145,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(
+              height: 5,
+            ),
             Expanded(
               child: _foundWords.isNotEmpty
                   ? ListView.builder(
@@ -184,67 +202,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Word {
-  final int id;
-  final String name;
-  final String mean;
-  bool favorite;
-
-  Word({
-    required this.id,
-    required this.name,
-    required this.mean,
-    this.favorite = false,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'mean': mean,
-      'favorite': favorite ? 1 : 0,
-    };
-  }
-
-  factory Word.fromMap(Map<String, dynamic> map) {
-    return Word(
-      id: map['id'],
-      name: map['name'],
-      mean: map['mean'],
-      favorite: map['favorite'] == 1,
-    );
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  final List<Word> favoriteWords;
-
-  const FavoritesPage({Key? key, required this.favoriteWords}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Favorite Words'),
-      ),
-      body: favoriteWords.isNotEmpty
-          ? ListView.builder(
-              itemCount: favoriteWords.length,
-              itemBuilder: (context, index) {
-                final word = favoriteWords[index];
-                return ListTile(
-                  title: Text(word.name),
-                  subtitle: Text(word.mean),
-                );
-              },
-            )
-          : const Center(
-              child: Text('No favorite words yet.'),
-            ),
     );
   }
 }
