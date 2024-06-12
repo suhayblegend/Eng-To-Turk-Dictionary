@@ -1,41 +1,16 @@
 import 'package:flutter/material.dart';
 
-class Word {
-  final int id;
-  final String name;
-  final String mean;
-  bool favorite;
-
-  Word({
-    required this.id,
-    required this.name,
-    required this.mean,
-    this.favorite = false,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'mean': mean,
-      'favorite': favorite ? 1 : 0,
-    };
-  }
-
-  factory Word.fromMap(Map<String, dynamic> map) {
-    return Word(
-      id: map['id'],
-      name: map['name'],
-      mean: map['mean'],
-      favorite: map['favorite'] == 1,
-    );
-  }
+void main() {
+  runApp(const MaterialApp(
+    home: LoginPage(),
+  ));
 }
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -82,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               obscureText: true,
               decoration: const InputDecoration(
-                labelText: 'Enter Password',
+                labelText: 'Enter Password To access this app',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -98,11 +73,43 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+class Word {
+  final int id;
+  final String name;
+  final String mean;
+  bool favorite;
+
+  Word({
+    required this.id,
+    required this.name,
+    required this.mean,
+    this.favorite = false,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'mean': mean,
+      'favorite': favorite ? 1 : 0,
+    };
+  }
+
+  factory Word.fromMap(Map<String, dynamic> map) {
+    return Word(
+      id: map['id'],
+      name: map['name'],
+      mean: map['mean'],
+      favorite: map['favorite'] == 1,
+    );
+  }
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -113,24 +120,12 @@ class _HomePageState extends State<HomePage> {
     {'id': 4, 'name': 'Hello', 'mean': 'Merhaba'},
     {'id': 5, 'name': 'Hi', 'mean': 'Selam'},
     {'id': 6, 'name': 'How are you?', 'mean': 'Nasılsın?'},
-    {
-      'id': 7,
-      'name': 'I\'m fine, thank you',
-      'mean': 'İyiyim, teşekkür ederim'
-    },
+    {'id': 7, 'name': 'I\'m fine, thank you', 'mean': 'İyiyim, teşekkür ederim'},
     {'id': 8, 'name': 'And you?', 'mean': 'Ve sen?'},
     {'id': 9, 'name': 'Have a nice day', 'mean': 'İyi günler'},
     {'id': 10, 'name': 'Goodbye', 'mean': 'Hoşçakal'},
-    {
-      'id': 99,
-      'name': 'What\'s the 101 on that new trend?',
-      'mean': 'O yeni trend hakkında temel bilgiler ne?'
-    },
-    {
-      'id': 100,
-      'name': 'It\'s all the rage right now',
-      'mean': 'Şu anda herkesin dilinde'
-    },
+    {'id': 99, 'name': 'What\'s the 101 on that new trend?', 'mean': 'O yeni trend hakkında temel bilgiler ne?'},
+    {'id': 100, 'name': 'It\'s all the rage right now', 'mean': 'Şu anda herkesin dilinde'},
   ];
 
   late List<Word> _foundWords;
@@ -178,7 +173,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.lightBlueAccent.shade400,
         title: const Text(
-          'ENGLISH TO TURKISH DICTIONARY',
+          'GRE Vocabulary Application',
           style: TextStyle(
             fontStyle: FontStyle.italic,
             color: Colors.black,
@@ -213,7 +208,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(
+              height: 5,
+            ),
             Expanded(
               child: _foundWords.isNotEmpty
                   ? ListView.builder(
@@ -296,10 +293,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
 }
