@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.0.0+3
+  share: ^2.0.4
 
 
 

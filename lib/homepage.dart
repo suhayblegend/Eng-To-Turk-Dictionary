@@ -1,110 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
-}
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _passwordController = TextEditingController();
-  final String _correctPassword = 'naseristhebestteacher';
-
-  void _login() {
-    String enteredPassword = _passwordController.text.trim();
-    if (enteredPassword == _correctPassword) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Incorrect Password'),
-          content: const Text('Please enter the correct password to continue.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Enter Password To access this app',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Word {
-  final int id;
-  final String name;
-  final String mean;
-  bool favorite;
-
-  Word({
-    required this.id,
-    required this.name,
-    required this.mean,
-    this.favorite = false,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'mean': mean,
-      'favorite': favorite ? 1 : 0,
-    };
-  }
-
-  factory Word.fromMap(Map<String, dynamic> map) {
-    return Word(
-      id: map['id'],
-      name: map['name'],
-      mean: map['mean'],
-      favorite: map['favorite'] == 1,
-    );
-  }
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -135,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _foundWords = _allWords.map((word) => Word.fromMap(word)).toList();
-    _favoriteWords = [];
+    _favoriteWords = _foundWords.where((word) => word.favorite).toList();
   }
 
   void _filter(String key) {
@@ -154,34 +49,60 @@ class _HomePageState extends State<HomePage> {
 
   void _toggleFavorite(int id) {
     setState(() {
-      final index = _foundWords.indexWhere((word) => word.id == id);
-      if (index != -1) {
-        _foundWords[index].favorite = !_foundWords[index].favorite;
-        if (_foundWords[index].favorite) {
-          _favoriteWords.add(_foundWords[index]);
-        } else {
-          _favoriteWords.removeWhere((word) => word.id == id);
-        }
-      }
+      final word = _foundWords.firstWhere((word) => word.id == id);
+      word.favorite = !word.favorite;
+      _favoriteWords = _foundWords.where((word) => word.favorite).toList();
     });
+  }
+
+  void _shareApp() {
+    // Implement sharing functionality
+    // For example, using the 'share' package
+    // Share.share('Check out this GRE Vocabulary app!');
+  }
+
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FavoritesPage(favoriteWords: _favoriteWords)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow.shade500,
       appBar: AppBar(
-        backgroundColor: Colors.lightBlueAccent.shade400,
-        title: const Text(
-          'ENGLISH TO TURKISH DICTIONARY',
-          style: TextStyle(
-            fontStyle: FontStyle.italic,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
-        ),
+        title: const Text('GRE Vocabulary Application'),
         centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite),
+              title: const Text('Favorites'),
+              onTap: _navigateToFavorites,
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('Share'),
+              onTap: _shareApp,
+            ),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -208,9 +129,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 5),
             Expanded(
               child: _foundWords.isNotEmpty
                   ? ListView.builder(
@@ -262,35 +181,70 @@ class _HomePageState extends State<HomePage> {
                       child: Text('Nothing Found'),
                     ),
             ),
-            if (_favoriteWords.isNotEmpty)
-              Column(
-                children: [
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Favorites',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _favoriteWords.length,
-                      itemBuilder: (context, index) {
-                        final word = _favoriteWords[index];
-                        return ListTile(
-                          title: Text(word.name),
-                          subtitle: Text(word.mean),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class Word {
+  final int id;
+  final String name;
+  final String mean;
+  bool favorite;
+
+  Word({
+    required this.id,
+    required this.name,
+    required this.mean,
+    this.favorite = false,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'mean': mean,
+      'favorite': favorite ? 1 : 0,
+    };
+  }
+
+  factory Word.fromMap(Map<String, dynamic> map) {
+    return Word(
+      id: map['id'],
+      name: map['name'],
+      mean: map['mean'],
+      favorite: map['favorite'] == 1,
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  final List<Word> favoriteWords;
+
+  const FavoritesPage({Key? key, required this.favoriteWords}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorite Words'),
+      ),
+      body: favoriteWords.isNotEmpty
+          ? ListView.builder(
+              itemCount: favoriteWords.length,
+              itemBuilder: (context, index) {
+                final word = favoriteWords[index];
+                return ListTile(
+                  title: Text(word.name),
+                  subtitle: Text(word.mean),
+                );
+              },
+            )
+          : const Center(
+              child: Text('No favorite words yet.'),
+            ),
     );
   }
 }

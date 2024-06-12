@@ -18,7 +18,7 @@ class DatabaseHelper {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE words(id INTEGER PRIMARY KEY, name TEXT, mean TEXT)",
+          "CREATE TABLE words(id INTEGER PRIMARY KEY, name TEXT, mean TEXT, favorite INTEGER)",
         );
       },
     );
@@ -33,10 +33,8 @@ class DatabaseHelper {
     final Database db = await database;
     return await db.query('words');
   }
-}
 
- Future<void> updateWord(Map<String, dynamic> word) async {
-    var database;
+  Future<void> updateWord(Map<String, dynamic> word) async {
     final Database db = await database;
     await db.update(
       'words',
@@ -45,3 +43,4 @@ class DatabaseHelper {
       whereArgs: [word['id']],
     );
   }
+}
