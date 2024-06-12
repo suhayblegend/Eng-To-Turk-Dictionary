@@ -32,11 +32,77 @@ class Word {
   }
 }
 
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _passwordController = TextEditingController();
+  final String _correctPassword = 'naseristhebestteacher';
+
+  void _login() {
+    String enteredPassword = _passwordController.text.trim();
+    if (enteredPassword == _correctPassword) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Incorrect Password'),
+          content: const Text('Please enter the correct password to continue.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Enter Password',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: _login,
+              child: const Text('Login'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -111,9 +177,9 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.yellow.shade500,
       appBar: AppBar(
         backgroundColor: Colors.lightBlueAccent.shade400,
-        title: Text(
+        title: const Text(
           'ENGLISH TO TURKISH DICTIONARY',
-          style: const TextStyle(
+          style: TextStyle(
             fontStyle: FontStyle.italic,
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -147,9 +213,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 5),
             Expanded(
               child: _foundWords.isNotEmpty
                   ? ListView.builder(
@@ -205,7 +269,7 @@ class _HomePageState extends State<HomePage> {
               Column(
                 children: [
                   const SizedBox(height: 10),
-                  Text(
+                  const Text(
                     'Favorites',
                     style: TextStyle(
                       fontSize: 20,
@@ -235,7 +299,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 void main() {
-  runApp(MaterialApp(
-    home: HomePage(),
+  runApp(const MaterialApp(
+    home: LoginPage(),
   ));
 }
